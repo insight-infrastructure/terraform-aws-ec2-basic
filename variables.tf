@@ -50,13 +50,14 @@ variable "ebs_volume_size" {
 //-----
 
 variable "key_name" {}
-variable "subnet_id" {}
+variable "public_key" {}
+//TODO: Hide this^^^
+
 variable "security_groups" {
   type = list
 }
+variable "subnet_id" {}
 
-variable "file_system_id" {
-  description = "The EFS file system id"
-}
-variable "public_key" {}
-variable "volume_id" {}
+//variable "file_system_id" {
+//  description = "The EFS file system id"
+//}

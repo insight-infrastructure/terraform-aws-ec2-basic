@@ -80,17 +80,17 @@ resource "aws_instance" "this" {
   }
 }
 
-data "template_file" "cloud-init" {
-  template = file("${path.module}/data/cloud_config_ubuntu_efs.yml")
-
-  vars = {
-    efs_directory  = var.efs_directory
-//    file_system_id = data.terraform_remote_state.efs.outputs.file_system_id
-    file_system_id = var.file_system_id
-//    ssh_public_key = data.terraform_remote_state.keys.outputs.public_key
-    public_key = var.public_key
-  }
-}
+//data "template_file" "cloud-init" {
+//  template = file("${path.module}/data/cloud_config_ubuntu_efs.yml")
+//
+//  vars = {
+//    efs_directory  = var.efs_directory
+////    file_system_id = data.terraform_remote_state.efs.outputs.file_system_id
+//    file_system_id = var.file_system_id
+////    ssh_public_key = data.terraform_remote_state.keys.outputs.public_key
+//    public_key = var.public_key
+//  }
+//}
 
 data "template_file" "user-data" {
   template = file("${path.module}/data/user_data_ubuntu_ebs.sh")
@@ -119,15 +119,15 @@ resource "aws_iam_instance_profile" "this" {
   role = aws_iam_role.this.name
 }
 
-data "template_file" "efs_mount_policy" {
-  template = file("${path.module}/data/efs_mount_policy.json")
-  vars = {
-//    file_system_id = data.terraform_remote_state.efs.outputs.file_system_id
-//    file_system_id = var.file_system_id
-//    account_id     = data.aws_caller_identity.this.account_id
-//    region         = data.aws_region.current.name
-  }
-}
+//data "template_file" "efs_mount_policy" {
+//  template = file("${path.module}/data/efs_mount_policy.json")
+//  vars = {
+////    file_system_id = data.terraform_remote_state.efs.outputs.file_system_id
+////    file_system_id = var.file_system_id
+////    account_id     = data.aws_caller_identity.this.account_id
+////    region         = data.aws_region.current.name
+//  }
+//}
 
 data "template_file" "ebs_mount_policy" {
   template = file("${path.module}/data/ebs_mount_policy.json")
@@ -139,10 +139,10 @@ data "template_file" "ebs_mount_policy" {
   }
 }
 
-resource "aws_iam_policy" "efs_mount_policy" {
-  name   = "${title(local.name)}EFSPolicy"
-  policy = data.template_file.efs_mount_policy.rendered
-}
+//resource "aws_iam_policy" "efs_mount_policy" {
+//  name   = "${title(local.name)}EFSPolicy"
+//  policy = data.template_file.efs_mount_policy.rendered
+//}
 
 resource "aws_iam_policy" "ebs_mount_policy" {
   name   = "${title(local.name)}EBSPolicy"
