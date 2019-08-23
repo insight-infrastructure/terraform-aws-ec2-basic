@@ -11,7 +11,6 @@ wget https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-
 dpkg -i amazon-cloudwatch-agent.deb
 
 # Install docker
-apt-get update
 apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 add-apt-repository \
