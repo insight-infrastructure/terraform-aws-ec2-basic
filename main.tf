@@ -89,6 +89,8 @@ resource "aws_volume_attachment" "this" {
   instance_id = aws_instance.this.id
 
   force_detach = true
+
+  depends_on = [aws_instance.this]
 }
 
 resource "aws_iam_instance_profile" "this" {
