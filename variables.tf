@@ -32,8 +32,7 @@ variable "root_volume_size" {
 variable "volume_path" {
 }
 
-variable "local_private_key" {
-}
+//variable "local_private_key" {} # TODO Only needed for remote calls but commented out now
 
 variable "efs_directory" {
 }

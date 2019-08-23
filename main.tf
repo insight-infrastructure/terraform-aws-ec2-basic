@@ -71,7 +71,7 @@ resource "aws_instance" "this" {
 //  subnet_id            = data.terraform_remote_state.vpc.outputs.public_subnets[0]
   subnet_id = var.subnet_id
 //  security_groups = [data.terraform_remote_state.security_groups.outputs.security_group_ids]
-  security_groups = [var.security_groups]
+  security_groups = var.security_groups
 
   root_block_device {
     volume_type           = "gp2"
