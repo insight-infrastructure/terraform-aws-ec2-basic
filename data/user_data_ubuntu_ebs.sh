@@ -26,56 +26,28 @@ chmod +x /usr/local/bin/docker-compose
 
 mkdir /data
 chown -R ubuntu:ubuntu /data/
+mkfs.ext4 /dev/xvdf
 mount /dev/xvdf /data
 
-cat <<EOF >/home/ubuntu/docker-compose.yml
-version: '3'
-services:
-   prep:
-      image: 'iconloop/prep-node:1905292100xdd3e5a'
-      network_mode: host
-      environment:
-         LOOPCHAIN_LOG_LEVEL: "SPAM"
-         DEFAULT_PATH: "/data/loopchain"
-         SERVICE: "jinseong"
-         LOG_OUTPUT_TYPE: "file"
-         TIMEOUT_FOR_LEADER_COMPLAIN : 120
-         MAX_TIMEOUT_FOR_LEADER_COMPLAIN : 600
-      volumes:
-         - /data:/data
-      ports:
-         - 9000:9000
-         - 7100:7100
+EC2_INSTANCE_ID=$(wget -q -O - http://169.254.169.254/latest/meta-data/instance-id || die \"wget instance-id has failed: $?\")
+EC2_AVAIL_ZONE=$(wget -q -O - http://169.254.169.254/latest/meta-data/placement/availability-zone || die \"wget availability-zone has failed: $?\")
+EC2_REGION="`echo \"$EC2_AVAIL_ZONE\" | sed -e 's:\([0-9][0-9]*\)[a-z]*\$:\\1:'`"
+
+       Logging
+cat<<EOF> /etc/systemd/system/awslogs.service
+[Unit]
+Description=Service for CloudWatch Logs agent
+After=rc-local.service
+
+[Service]
+Type=simple
+Restart=always
+KillMode=process
+TimeoutSec=infinity
+PIDFile=/var/awslogs/state/awslogs.pid
+ExecStart=/var/awslogs/bin/awslogs-agent-launcher.sh --start --background --pidfile $PIDFILE --user awslogs --chuid awslogs &
+
+[Install]
+WantedBy=multi-user.target
 EOF
-
-chown ubuntu:ubuntu /home/ubuntu/docker-compose.yml
-
-/usr/local/bin/docker-compose -f /home/ubuntu/docker-compose.yml up -d
-
-#EC2_INSTANCE_ID=$(wget -q -O - http://169.254.169.254/latest/meta-data/instance-id || die \"wget instance-id has failed: $?\")
-#EC2_AVAIL_ZONE=$(wget -q -O - http://169.254.169.254/latest/meta-data/placement/availability-zone || die \"wget availability-zone has failed: $?\")
-#EC2_REGION="`echo \"$EC2_AVAIL_ZONE\" | sed -e 's:\([0-9][0-9]*\)[a-z]*\$:\\1:'`"
-
-#       Logging
-#cat<<EOF> /etc/systemd/system/awslogs.service
-#[Unit]
-#Description=Service for CloudWatch Logs agent
-#After=rc-local.service
-#
-#[Service]
-#Type=simple
-#Restart=always
-#KillMode=process
-#TimeoutSec=infinity
-#PIDFile=/var/awslogs/state/awslogs.pid
-#ExecStart=/var/awslogs/bin/awslogs-agent-launcher.sh --start --background --pidfile $PIDFILE --user awslogs --chuid awslogs &
-#
-#[Install]
-#WantedBy=multi-user.target
-#EOF
-#systemctl start awslogs.service
-
-#sudo file -s /dev/nvme1n1
-#sudo mkdir /opt/data
-#sudo mount /dev/nvme1n1 /opt/data
-#echo 'EBS volume attached!'
+systemctl start awslogs.service
