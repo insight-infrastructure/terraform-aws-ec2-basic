@@ -60,3 +60,7 @@ variable "subnet_id" {}
 //variable "file_system_id" {
 //  description = "The EFS file system id"
 //}
+
+//----------
+
+variable "instance_profile_id" {}

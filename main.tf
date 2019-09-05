@@ -66,7 +66,7 @@ resource "aws_instance" "this" {
   user_data = data.template_file.user_data.rendered
   key_name = var.key_name
 
-  iam_instance_profile = aws_iam_instance_profile.this.id
+  iam_instance_profile = var.instance_profile_id
   subnet_id = var.subnet_id
   security_groups = var.security_groups
 
@@ -91,54 +91,4 @@ resource "aws_volume_attachment" "this" {
   force_detach = true
 
   depends_on = [aws_instance.this]
-}
-
-resource "aws_iam_instance_profile" "this" {
-  name = "test_profile"
-  role = aws_iam_role.this.name
-}
-
-data "template_file" "ebs_mount_policy" {
-  template = file("${path.module}/data/ebs_mount_policy.json")
-//TODO: IAM lockdown
-  vars = {
-//    file_system_id = data.terraform_remote_state.efs.outputs.file_system_id
-//    account_id     = data.aws_caller_identity.this.account_id
-//    region         = data.aws_region.current.name
-  }
-}
-
-
-resource "aws_iam_policy" "ebs_mount_policy" {
-  name   = "${title(local.name)}EBSPolicy"
-  policy = data.template_file.ebs_mount_policy.rendered
-}
-
-resource "aws_iam_role_policy_attachment" "efs_mount_policy" {
-  role       = aws_iam_role.this.name
-  policy_arn = aws_iam_policy.ebs_mount_policy.arn
-}
-
-resource "aws_iam_role_policy_attachment" "ebs_mount_policy" {
-  role       = aws_iam_role.this.name
-  policy_arn = aws_iam_policy.ebs_mount_policy.arn
-}
-
-resource "aws_iam_role" "this" {
-  name               = "${title(local.name)}EFSRole"
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
 }
