@@ -8,8 +8,8 @@ Terragrunt, a Terraform wrapper.
 
 - ec2
     - Bootstraps docker-compose through user-data 
-- IAM 
-    - Includes instance profile to mount EBS volume 
+- spot instance request 
+   
 
 ### What this doesn't include 
 

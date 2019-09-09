@@ -23,28 +23,18 @@ variable "private_subnets" {
   type = list(string)
 }
 
-variable "instance_type" {
-}
-
-variable "root_volume_size" {
-}
-
-variable "volume_path" {
-}
+variable "instance_type" {}
+variable "root_volume_size" {}
+variable "volume_path" {}
 
 //variable "local_private_key" {} # TODO Only needed for remote calls but commented out now
-
-variable "efs_directory" {
-}
 
 variable "azs" {
   description = "The availablity zones to deploy each ebs volume into."
   type        = list(string)
 }
 
-variable "ebs_volume_size" {
-  description = "...."
-}
+variable "ebs_volume_size" {}
 
 //-----
 
@@ -57,10 +47,11 @@ variable "security_groups" {
 }
 variable "subnet_id" {}
 
-//variable "file_system_id" {
-//  description = "The EFS file system id"
-//}
-
 //----------
 
 variable "instance_profile_id" {}
+
+variable "spot_price" {
+  default = 0
+  type = number
+}
