@@ -8,6 +8,7 @@ terraform {
 locals {
   name = var.resource_group
   common_tags = {
+    "Name" = local.name
     "Terraform" = true
     "Environment" = var.environment
   }
@@ -70,6 +71,8 @@ resource "aws_volume_attachment" "this" {
   instance_id = var.spot_price == 0 ? aws_instance.this.*.id[0] : module.instance_id.stdout
 
   force_detach = true
+
+  depends_on = [null_resource.wait_on_startup]
 }
 
 data "template_file" "user_data" {
@@ -127,4 +130,11 @@ resource "aws_spot_instance_request" "this" {
 module "instance_id" {
   source = "matti/resource/shell"
   command = format("aws ec2 wait spot-instance-request-fulfilled --spot-instance-request-ids %s && aws ec2 describe-spot-instance-requests --spot-instance-request-ids %s | jq -r '.SpotInstanceRequests[].InstanceId'", aws_spot_instance_request.this.*.id[0], aws_spot_instance_request.this.*.id[0])
+}
+
+resource "null_resource" "wait_on_startup" {
+//This will fail on windows as it has a different sleep command - USE WSL ALWAYS
+  provisioner "local-exec" {
+    command = "sleep 20"
+  }
 }

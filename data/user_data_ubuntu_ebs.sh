@@ -4,19 +4,15 @@ export DEBIAN_FRONTEND=noninteractive
 
 apt-get update -y
 apt-get upgrade -y
-apt-get dist-upgrade -y
+#apt-get dist-upgrade -y
 apt-get install -y linux-aws
 apt-get install -y awscli
 apt install python -y
+#apt install python3-dev -y
 
 EC2_INSTANCE_ID=$(wget -q -O - http://169.254.169.254/latest/meta-data/instance-id || die \"wget instance-id has failed: $?\")
 EC2_AVAIL_ZONE=$(wget -q -O - http://169.254.169.254/latest/meta-data/placement/availability-zone || die \"wget availability-zone has failed: $?\")
 EC2_REGION="`echo \"$EC2_AVAIL_ZONE\" | sed -e 's:\([0-9][0-9]*\)[a-z]*\$:\\1:'`"
-
-# Cloudwatch
-curl https://s3.amazonaws.com//aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
-chmod +x ./awslogs-agent-setup.py
-./awslogs-agent-setup.py -n -r us-east-1 -c s3://${log_config_bucket}/p-rep-log-config.
 
 #wget https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
 #dpkg -i amazon-cloudwatch-agent.deb
@@ -40,4 +36,9 @@ mkdir /data
 chown -R ubuntu:ubuntu /data/
 mkfs.ext4 /dev/xvdf
 mount /dev/xvdf /data
+
+# Cloudwatch
+curl https://s3.amazonaws.com//aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
+chmod +x ./awslogs-agent-setup.py
+/awslogs-agent-setup.py -n -r us-east-1 -c s3://${log_config_bucket}/${log_config_key}.
 
