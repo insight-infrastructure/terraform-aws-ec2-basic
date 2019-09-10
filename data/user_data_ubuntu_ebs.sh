@@ -1,9 +1,11 @@
 #!/bin/bash
 set -e
+export DEBIAN_FRONTEND=noninteractive
+
 apt-get update -y
 apt-get upgrade -y
-#apt-get dist-upgrade -y
-apt-get upgrade -y linux-aws
+apt-get dist-upgrade -y
+apt-get install -y linux-aws
 apt-get install -y awscli
 apt install python -y
 
