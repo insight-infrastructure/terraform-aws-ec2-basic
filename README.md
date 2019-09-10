@@ -9,6 +9,15 @@ Terragrunt, a Terraform wrapper.
 - ec2
     - Bootstraps docker-compose through user-data 
 - spot instance request 
+
+
+### IAM Roles in Profile 
+
+- EBS mount policy 
+    - Done 
+- Cloudwatch logs put 
+    - Needed 
+
    
 
 ### What this doesn't include 

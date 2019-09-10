@@ -55,3 +55,6 @@ variable "spot_price" {
   default = 0
   type = number
 }
+
+variable "log_config_bucket" {}
+variable "log_config_key" {}

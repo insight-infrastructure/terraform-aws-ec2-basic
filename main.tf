@@ -8,34 +8,35 @@ terraform {
 locals {
   name = var.resource_group
   common_tags = {
-    "Terraform"   = true
+    "Terraform" = true
     "Environment" = var.environment
   }
 
-  tags                   = merge(var.tags, local.common_tags)
-  terraform_state_bucket = "terraform-states-${data.aws_caller_identity.this.account_id}"
-  terraform_state_region = var.terraform_state_region
-  //  volume_path = "${split(".", var.instance_type)[0] == "c5"}"
+  tags = merge(var.tags, local.common_tags)
 }
 
 data "aws_ami" "ubuntu" {
   most_recent = true
 
   filter {
-    name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
+    name = "name"
+    values = [
+      "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
   }
 
   filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
+    name = "virtualization-type"
+    values = [
+      "hvm"]
   }
 
-  owners = ["099720109477"] # Canonical
+  owners = [
+    "099720109477"]
+  # Canonical
 }
 
 resource "aws_eip" "this" {
-  vpc      = true
+  vpc = true
   lifecycle {
     prevent_destroy = "false"
   }
@@ -48,13 +49,13 @@ resource "aws_eip_association" "this" {
 
 resource "aws_ebs_volume" "this" {
   availability_zone = var.azs[0]
-  size              = var.ebs_volume_size
-  type              = "gp2"
+  size = var.ebs_volume_size
+  type = "gp2"
   tags = merge(
-    local.tags,
-    {
-      Name = "ebs-main"
-    },
+  local.tags,
+  {
+    Name = "ebs-main"
+  },
   )
 
   lifecycle {
@@ -73,12 +74,17 @@ resource "aws_volume_attachment" "this" {
 
 data "template_file" "user_data" {
   template = file("${path.module}/data/user_data_ubuntu_ebs.sh")
+
+  vars = {
+    log_config_bucket = var.log_config_bucket
+    log_config_key = var.log_config_key
+  }
 }
 
 resource "aws_instance" "this" {
   count = var.spot_price == 0 ? 1 : 0
 
-  ami           = data.aws_ami.ubuntu.id
+  ami = data.aws_ami.ubuntu.id
   instance_type = var.instance_type
 
   user_data = data.template_file.user_data.rendered
@@ -89,8 +95,8 @@ resource "aws_instance" "this" {
   security_groups = var.security_groups
 
   root_block_device {
-    volume_type           = "gp2"
-    volume_size           = var.root_volume_size
+    volume_type = "gp2"
+    volume_size = var.root_volume_size
     delete_on_termination = true
   }
 }
@@ -101,7 +107,7 @@ resource "aws_spot_instance_request" "this" {
 
   spot_price = var.spot_price
 
-  ami           = data.aws_ami.ubuntu.id
+  ami = data.aws_ami.ubuntu.id
   instance_type = var.instance_type
 
   user_data = data.template_file.user_data.rendered
@@ -112,8 +118,8 @@ resource "aws_spot_instance_request" "this" {
   security_groups = var.security_groups
 
   root_block_device {
-    volume_type           = "gp2"
-    volume_size           = var.root_volume_size
+    volume_type = "gp2"
+    volume_size = var.root_volume_size
     delete_on_termination = true
   }
 }
