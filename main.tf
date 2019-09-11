@@ -137,4 +137,5 @@ resource "null_resource" "wait_on_startup" {
   provisioner "local-exec" {
     command = "sleep 20"
   }
+  depends_on = []
 }

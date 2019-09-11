@@ -42,3 +42,27 @@ curl https://s3.amazonaws.com//aws-cloudwatch/downloads/latest/awslogs-agent-set
 chmod +x ./awslogs-agent-setup.py
 /awslogs-agent-setup.py -n -r us-east-1 -c s3://${log_config_bucket}/${log_config_key}.
 
+cat<<EOF>>/home/ubuntu/docker-compose.yaml
+version: '3'
+services:
+  citizen:
+    image: 'iconloop/citizen-node:1908271151xd2b7a4'
+    network_mode: host
+    environment:
+      LOG_OUTPUT_TYPE: "file"
+      LOOPCHAIN_LOG_LEVEL: "DEBUG"
+      FASTEST_START: "yes"     # Restore from lastest snapshot DB
+
+    volumes:
+      - ./data:/data  # mount a data volumes
+      - ./keys:/citizen_pack/keys  # Automatically generate cert key files here
+    ports:
+      - 9000:9000
+EOF
+#TODO: Add keystore to bucket for TestNet.  Need to streamline keystore handling
+# We could  SCP it in via terraform
+
+# Cloudwatch
+curl https://s3.amazonaws.com//aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
+chmod +x ./awslogs-agent-setup.py
+/awslogs-agent-setup.py -n -r us-east-1 -c s3://${log_config_bucket}/${log_config_key}.
