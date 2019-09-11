@@ -129,7 +129,7 @@ resource "aws_spot_instance_request" "this" {
 
 module "instance_id" {
   source = "matti/resource/shell"
-  command = format("aws ec2 wait spot-instance-request-fulfilled --spot-instance-request-ids %s && aws ec2 describe-spot-instance-requests --spot-instance-request-ids %s | jq -r '.SpotInstanceRequests[].InstanceId'", aws_spot_instance_request.this.*.id[0], aws_spot_instance_request.this.*.id[0])
+  command = var.spot_price == 0 ? "echo no-waiting" : format("aws ec2 wait spot-instance-request-fulfilled --spot-instance-request-ids %s && aws ec2 describe-spot-instance-requests --spot-instance-request-ids %s | jq -r '.SpotInstanceRequests[].InstanceId'", aws_spot_instance_request.this.*.id[0], aws_spot_instance_request.this.*.id[0])
 }
 
 resource "null_resource" "wait_on_startup" {
@@ -137,5 +137,5 @@ resource "null_resource" "wait_on_startup" {
   provisioner "local-exec" {
     command = "sleep 20"
   }
-  depends_on = []
+  depends_on = [module.instance_id]
 }
