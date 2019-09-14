@@ -51,10 +51,5 @@ variable "subnet_id" {}
 
 variable "instance_profile_id" {}
 
-variable "spot_price" {
-  default = 0
-  type = number
-}
-
 variable "log_config_bucket" {}
 variable "log_config_key" {}
