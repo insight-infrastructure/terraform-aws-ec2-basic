@@ -1,15 +1,7 @@
 output "private_ip" {
-  value = var.spot_price == 0 ? aws_instance.this.*.private_ip[0] : aws_spot_instance_request.this.*.private_ip[0]
+  value = aws_instance.this.private_ip
 }
 
 output "instance_id" {
-  value = var.spot_price == 0 ? aws_instance.this.*.id[0] : module.instance_id.stdout
+  value = aws_instance.this.id
 }
-
-//output "ami_id" {
-//  value = data.aws_ami.ubuntu.id
-//}
-//
-//output "user_data" {
-//  value = data.template_file.user_data.rendered
-//}
