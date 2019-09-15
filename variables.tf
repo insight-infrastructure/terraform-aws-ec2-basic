@@ -19,9 +19,9 @@ variable "terraform_state_region" {
   description = "AWS region used for Terraform states"
 }
 
-variable "private_subnets" {
-  type = list(string)
-}
+//variable "private_subnets" {
+//  type = list(string)
+//}
 
 variable "instance_type" {}
 variable "root_volume_size" {}
