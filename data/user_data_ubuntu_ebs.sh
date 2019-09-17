@@ -8,6 +8,7 @@ apt-get upgrade -y
 apt-get install -y linux-aws
 apt-get install -y awscli
 apt install python -y
+apt install python-apt -y
 #apt install python3-dev -y
 
 EC2_INSTANCE_ID=$(wget -q -O - http://169.254.169.254/latest/meta-data/instance-id || die \"wget instance-id has failed: $?\")
@@ -41,6 +42,10 @@ mount /dev/xvdf /data
 curl https://s3.amazonaws.com//aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
 chmod +x ./awslogs-agent-setup.py
 /awslogs-agent-setup.py -n -r us-east-1 -c s3://${log_config_bucket}/${log_config_key}.
+
+# Create the file ansible hardening depends on. Playbook fails if this file does not exist.
+# TODO: Investigate why the existence of file, even empty, is needed. Or configure it accordingly.
+touch /etc/security/limits.d/10.hardcore.conf
 
 cat<<EOF>>/home/ubuntu/docker-compose.yaml
 version: '3'
