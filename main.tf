@@ -73,7 +73,7 @@ resource "aws_volume_attachment" "this" {
 }
 
 data "template_file" "user_data" {
-  template = file("${path.module}/data/user_data_ubuntu_ebs.sh")
+  template = file("${path.module}/data/${var.user_data_script}")
 
   vars = {
     log_config_bucket = var.log_config_bucket
