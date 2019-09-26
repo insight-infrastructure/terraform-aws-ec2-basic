@@ -38,6 +38,10 @@ chown -R ubuntu:ubuntu /data/
 mkfs.ext4 /dev/xvdf
 mount /dev/xvdf /data
 
+# TODO: RM this
+mkdir /home/ubuntu/data
+ln -s /data /home/ubuntu/data
+
 # Cloudwatch
 curl https://s3.amazonaws.com//aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
 chmod +x ./awslogs-agent-setup.py
@@ -47,7 +51,7 @@ chmod +x ./awslogs-agent-setup.py
 # TODO: Investigate why the existence of file, even empty, is needed. Or configure it accordingly.
 touch /etc/security/limits.d/10.hardcore.conf
 
-cat<<EOF>>/home/ubuntu/docker-compose.yaml
+cat<<EOF >>/home/ubuntu/docker-compose.yaml
 version: '3'
 services:
   citizen:
@@ -67,3 +71,4 @@ EOF
 #TODO: Add keystore to bucket for TestNet.  Need to streamline keystore handling
 # We could  SCP it in via terraform
 
+docker-compose up -d
