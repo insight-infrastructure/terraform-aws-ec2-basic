@@ -6,8 +6,8 @@ variable "environment" {
   description = "The environment that generally corresponds to the account you are deploying into."
 }
 
-variable "resource_group" {
-  description = "The grouping that is conventionally used to name resources"
+variable "name" {
+  description = "The name to be used in tags"
 }
 
 variable "tags" {
@@ -19,9 +19,9 @@ variable "terraform_state_region" {
   description = "AWS region used for Terraform states"
 }
 
-variable "private_subnets" {
-  type = list(string)
-}
+//variable "private_subnets" {
+//  type = list(string)
+//}
 
 variable "instance_type" {}
 variable "root_volume_size" {}
@@ -51,10 +51,13 @@ variable "subnet_id" {}
 
 variable "instance_profile_id" {}
 
-variable "spot_price" {
-  default = 0
-  type = number
-}
-
 variable "log_config_bucket" {}
 variable "log_config_key" {}
+
+variable "user_data_script" {
+  type = string
+  default = "user_data_ubuntu_ebs.sh"
+}
+
+variable "root_domain_name" {}
+variable "zone_id" {}
