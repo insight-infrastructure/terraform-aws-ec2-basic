@@ -58,3 +58,6 @@ variable "user_data_script" {
   type = string
   default = "user_data_ubuntu_ebs.sh"
 }
+
+variable "root_domain_name" {}
+variable "zone_id" {}
