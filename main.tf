@@ -11,6 +11,7 @@ locals {
     "Name" = local.name
     "Terraform" = true
     "Environment" = var.environment
+    "Region" = data.aws_region.current.name
   }
 
   tags = merge(var.tags, local.common_tags)
@@ -41,6 +42,8 @@ resource "aws_eip" "this" {
   lifecycle {
     prevent_destroy = "false"
   }
+
+  tags = local.tags
 }
 
 resource "aws_eip_association" "this" {
@@ -52,16 +55,12 @@ resource "aws_ebs_volume" "this" {
   availability_zone = var.azs[0]
   size = var.ebs_volume_size
   type = "gp2"
-  tags = merge(
-  local.tags,
-  {
-    Name = "ebs-main"
-  },
-  )
 
   lifecycle {
     prevent_destroy = "false"
   }
+
+  tags = local.tags
 }
 
 resource "aws_volume_attachment" "this" {
@@ -97,14 +96,17 @@ resource "aws_instance" "this" {
     volume_size = var.root_volume_size
     delete_on_termination = true
   }
+
+  tags = local.tags
 }
 
 resource "aws_route53_record" "a-record" {
   allow_overwrite = true
-  name            = "p-rep"
-  ttl             = 30
-  type            = "A"
-  zone_id         = var.zone_id
+  name = "p-rep"
+  ttl = 30
+  type = "A"
+  zone_id = var.zone_id
 
-  records = [aws_instance.this.private_ip]
+  records = [
+    aws_instance.this.private_ip]
 }
