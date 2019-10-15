@@ -56,9 +56,10 @@ resource "aws_ebs_volume" "this" {
   size = var.ebs_volume_size
   type = "gp2"
 
-  lifecycle {
-    prevent_destroy = var.ebs_prevent_destroy
-  }
+//  lifecycle {
+//  https://github.com/hashicorp/terraform/issues/22544
+//    prevent_destroy = var.ebs_prevent_destroy
+//  }
 
   tags = local.tags
 }
@@ -98,9 +99,10 @@ resource "aws_instance" "this" {
     delete_on_termination = true
   }
 
-  lifecycle {
-    prevent_destroy = var.ec2_prevent_destroy
-  }
+//  lifecycle {
+//  https://github.com/hashicorp/terraform/issues/22544
+//    prevent_destroy = var.ec2_prevent_destroy
+//  }
 
   tags = local.tags
 }
