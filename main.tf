@@ -57,7 +57,7 @@ resource "aws_ebs_volume" "this" {
   type = "gp2"
 
   lifecycle {
-    prevent_destroy = "false"
+    prevent_destroy = var.ebs_prevent_destroy
   }
 
   tags = local.tags
@@ -81,10 +81,11 @@ data "template_file" "user_data" {
 }
 
 resource "aws_instance" "this" {
-  ami = data.aws_ami.ubuntu.id
   instance_type = var.instance_type
 
-  user_data = data.template_file.user_data.rendered
+  ami = var.ami_id == "" ? data.aws_ami.ubuntu.id : var.ami_id
+  user_data = var.user_data == "" ? data.template_file.user_data.rendered : var.user_data
+
   key_name = var.key_name
 
   iam_instance_profile = var.instance_profile_id
@@ -95,6 +96,10 @@ resource "aws_instance" "this" {
     volume_type = "gp2"
     volume_size = var.root_volume_size
     delete_on_termination = true
+  }
+
+  lifecycle {
+    prevent_destroy = var.ec2_prevent_destroy
   }
 
   tags = local.tags

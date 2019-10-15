@@ -15,49 +15,82 @@ variable "tags" {
   type        = map(string)
 }
 
-variable "terraform_state_region" {
-  description = "AWS region used for Terraform states"
+//----------------------------
+
+variable "instance_type" {
+  type = string
+}
+variable "root_volume_size" {
+  type = number
+}
+variable "volume_path" {
+  type = string
+  default = "/dev/sdf"
 }
 
-//variable "private_subnets" {
-//  type = list(string)
-//}
+variable "ebs_volume_size" {
+  type = number
+}
 
-variable "instance_type" {}
-variable "root_volume_size" {}
-variable "volume_path" {}
+variable "ebs_prevent_destroy" {
+  type = bool
+  default = false
+}
 
-//variable "local_private_key" {} # TODO Only needed for remote calls but commented out now
+variable "ec2_prevent_destroy" {
+  type = bool
+  default = false
+}
+
+//----------------------------
+
+variable "key_name" {
+  type = string
+}
+variable "public_key" {
+  type = string
+}
+
+variable "security_groups" {
+  type = list
+}
 
 variable "azs" {
   description = "The availablity zones to deploy each ebs volume into."
   type        = list(string)
 }
 
-variable "ebs_volume_size" {}
-
-//-----
-
-variable "key_name" {}
-variable "public_key" {}
-//TODO: Hide this^^^
-
-variable "security_groups" {
-  type = list
+variable "subnet_id" {
+  type = string
 }
-variable "subnet_id" {}
 
-//----------
+//----------------------------
 
-variable "instance_profile_id" {}
+variable "instance_profile_id" {
+  type = string
+}
 
-variable "log_config_bucket" {}
-variable "log_config_key" {}
+variable "log_config_bucket" {
+  type = string
+  default = ""
+}
+variable "log_config_key" {
+  type = string
+  default = ""
+}
 
 variable "user_data_script" {
   type = string
   default = "user_data_ubuntu_ebs.sh"
 }
 
-variable "root_domain_name" {}
-variable "zone_id" {}
+variable "user_data" {
+  type = string
+  default = ""
+}
+
+variable "ami_id" {
+  type = string
+  default = ""
+}
+
