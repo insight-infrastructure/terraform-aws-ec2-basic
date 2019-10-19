@@ -38,6 +38,8 @@ data "aws_ami" "ubuntu" {
 }
 
 resource "aws_eip" "this" {
+  count = var.create_eip ? 1 : 0
+
   vpc = true
   lifecycle {
     prevent_destroy = "false"
@@ -47,11 +49,15 @@ resource "aws_eip" "this" {
 }
 
 resource "aws_eip_association" "this" {
-  allocation_id = aws_eip.this.id
+  count = var.create_eip ? 1 : 0
+
+  allocation_id = aws_eip.this.*.id[0]
   instance_id = aws_instance.this.id
 }
 
 resource "aws_ebs_volume" "this" {
+  count = var.ebs_volume_size > 0 ? 1 : 0
+
   availability_zone = var.azs[0]
   size = var.ebs_volume_size
   type = "gp2"
@@ -65,9 +71,11 @@ resource "aws_ebs_volume" "this" {
 }
 
 resource "aws_volume_attachment" "this" {
+  count = var.ebs_volume_size > 0 ? 1 : 0
+
   device_name = var.volume_path
 
-  volume_id = aws_ebs_volume.this.id
+  volume_id = aws_ebs_volume.this.*.id[0]
   instance_id = aws_instance.this.id
   force_detach = true
 }

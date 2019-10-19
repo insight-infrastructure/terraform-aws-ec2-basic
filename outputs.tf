@@ -3,7 +3,8 @@ output "private_ip" {
 }
 
 output "public_ip" {
-  value = aws_eip.this.public_ip
+  value = join("", aws_eip.this.*.public_ip)
+  depends_on = [aws_eip.this]
 }
 
 output "instance_id" {

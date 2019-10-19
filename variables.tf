@@ -47,9 +47,6 @@ variable "ec2_prevent_destroy" {
 variable "key_name" {
   type = string
 }
-variable "public_key" {
-  type = string
-}
 
 variable "security_groups" {
   type = list
@@ -62,6 +59,11 @@ variable "azs" {
 
 variable "subnet_id" {
   type = string
+}
+
+variable "create_eip" {
+  type = bool
+  default = false
 }
 
 //----------------------------
