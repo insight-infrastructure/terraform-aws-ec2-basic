@@ -1,6 +1,6 @@
-variable "region" {
-  description = "The region you are deploying into"
-}
+//variable "region" {
+//  description = "The region you are deploying into"
+//}
 
 variable "environment" {
   description = "The environment that generally corresponds to the account you are deploying into."
@@ -52,9 +52,9 @@ variable "security_groups" {
   type = list
 }
 
-variable "azs" {
-  description = "The availablity zones to deploy each ebs volume into."
-  type        = list(string)
+variable "availability_zone" {
+  description = "The availablity zone to deploy into."
+  type        = string
 }
 
 variable "subnet_id" {

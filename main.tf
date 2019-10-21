@@ -58,7 +58,7 @@ resource "aws_eip_association" "this" {
 resource "aws_ebs_volume" "this" {
   count = var.ebs_volume_size > 0 ? 1 : 0
 
-  availability_zone = var.azs[0]
+  availability_zone = var.availability_zone
   size = var.ebs_volume_size
   type = "gp2"
 
@@ -114,14 +114,3 @@ resource "aws_instance" "this" {
 
   tags = local.tags
 }
-
-//resource "aws_route53_record" "a-record" {
-//  allow_overwrite = true
-//  name = "p-rep"
-//  ttl = 30
-//  type = "A"
-//  zone_id = var.zone_id
-//
-//  records = [
-//    aws_instance.this.private_ip]
-//}
