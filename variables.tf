@@ -70,6 +70,7 @@ variable "create_eip" {
 
 variable "instance_profile_id" {
   type = string
+  default = ""
 }
 
 variable "log_config_bucket" {
