@@ -41,8 +41,9 @@ resource "aws_eip" "this" {
   count = var.create_eip ? 1 : 0
 
   vpc = true
+
   lifecycle {
-    prevent_destroy = "false"
+    prevent_destroy = false
   }
 
   tags = local.tags
@@ -51,7 +52,7 @@ resource "aws_eip" "this" {
 resource "aws_eip_association" "this" {
   count = var.create_eip ? 1 : 0
 
-  allocation_id = aws_eip.this.*.id[0]
+  allocation_id = aws_eip.this.*.id[count.index]
   instance_id = aws_instance.this.id
 }
 
@@ -75,7 +76,7 @@ resource "aws_volume_attachment" "this" {
 
   device_name = var.volume_path
 
-  volume_id = aws_ebs_volume.this.*.id[0]
+  volume_id = aws_ebs_volume.this.*.id[count.index]
   instance_id = aws_instance.this.id
   force_detach = true
 }
@@ -100,7 +101,7 @@ resource "aws_instance" "this" {
   iam_instance_profile = var.instance_profile_id
 
   subnet_id = var.subnet_id
-  security_groups = var.security_groups
+  vpc_security_group_ids = var.security_groups
 
   root_block_device {
     volume_type = "gp2"

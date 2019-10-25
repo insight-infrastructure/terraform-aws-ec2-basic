@@ -42,6 +42,11 @@ variable "ec2_prevent_destroy" {
   default = false
 }
 
+variable "eip_prevent_destroy" {
+  type = bool
+  default = false
+}
+
 //----------------------------
 
 variable "key_name" {
@@ -49,7 +54,7 @@ variable "key_name" {
 }
 
 variable "security_groups" {
-  type = list
+  type = list(string)
 }
 
 variable "availability_zone" {
