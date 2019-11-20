@@ -10,3 +10,7 @@ output "public_ip" {
 output "instance_id" {
   value = aws_instance.this.id
 }
+
+output "volume_path" {
+  value = var.volume_path
+}
