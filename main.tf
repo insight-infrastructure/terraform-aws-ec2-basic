@@ -71,6 +71,17 @@ resource "aws_ebs_volume" "this" {
   tags = local.tags
 }
 
+data "local_file" "key_local" {
+  count = var.key_name == "" ? 1 : 0
+  filename = var.local_public_key
+}
+
+resource "aws_key_pair" "this" {
+  count = var.key_name == "" ? 1 : 0
+  key_name = local.name
+  public_key = data.local_file.key_local[0].content
+}
+
 resource "aws_volume_attachment" "this" {
   count = var.ebs_volume_size > 0 ? 1 : 0
 
@@ -96,7 +107,7 @@ resource "aws_instance" "this" {
   ami = var.ami_id == "" ? data.aws_ami.ubuntu.id : var.ami_id
   user_data = var.user_data == "" ? data.template_file.user_data.rendered : var.user_data
 
-  key_name = var.key_name
+  key_name = var.key_name == "" ? aws_key_pair.this[0].key_name : var.key_name
 
   iam_instance_profile = var.instance_profile_id
 

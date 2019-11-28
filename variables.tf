@@ -51,6 +51,13 @@ variable "eip_prevent_destroy" {
 
 variable "key_name" {
   type = string
+  default = ""
+  description = "If this is supplied, it takes precidence"
+}
+
+variable "local_public_key" {
+  type = string
+  default = ""
 }
 
 variable "security_groups" {
