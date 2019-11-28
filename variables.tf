@@ -1,11 +1,3 @@
-//variable "region" {
-//  description = "The region you are deploying into"
-//}
-
-variable "environment" {
-  description = "The environment that generally corresponds to the account you are deploying into."
-}
-
 variable "name" {
   description = "The name to be used in tags"
 }
