@@ -7,7 +7,66 @@ variable "tags" {
   type        = map(string)
 }
 
-//----------------------------
+#####
+# vpc
+#####
+
+
+variable "vpc_id" {
+  type = string
+  default = ""
+  description = "Supply both vpc_id and subnet_id or deploy into default vpc"
+}
+
+variable "subnet_id" {
+  type = string
+  default = ""
+  description = "Supply both vpc_id and subnet_id or deploy into default vpc"
+}
+
+############
+# elastic ip
+############
+
+variable "create_eip" {
+  type = bool
+  default = false
+  description = "Optional ability to create elastic IP"
+}
+
+#################
+# security groups
+#################
+
+variable "security_groups" {
+  type = list(string)
+}
+
+variable "egress_rules" {
+  default = ["all-all"]
+  type = list(string)
+  description = "From terraform-aws-security-group module"
+}
+variable "ingress_cidr_blocks" {
+  type = list(string)
+  default = []
+  description = "From terraform-aws-security-group module"
+}
+variable "ingress_with_cidr_blocks" {
+  default = [{}]
+  type = list(map(string))
+  description = "From terraform-aws-security-group module"
+}
+variable "ingress_rules" {
+  type = list(string)
+  default = []
+  description = "From terraform-aws-security-group module"
+}
+
+#############
+# default AMI
+#############
+
 
 variable "instance_type" {
   type = string
@@ -50,24 +109,6 @@ variable "key_name" {
 variable "local_public_key" {
   type = string
   default = ""
-}
-
-variable "security_groups" {
-  type = list(string)
-}
-
-variable "availability_zone" {
-  description = "The availablity zone to deploy into."
-  type        = string
-}
-
-variable "subnet_id" {
-  type = string
-}
-
-variable "create_eip" {
-  type = bool
-  default = false
 }
 
 //----------------------------
