@@ -16,6 +16,10 @@ locals {
   tags = merge(var.tags, local.common_tags)
 }
 
+#############
+# default AMI
+#############
+
 data "aws_ami" "ubuntu" {
   most_recent = true
 
@@ -36,6 +40,10 @@ data "aws_ami" "ubuntu" {
   # Canonical
 }
 
+############
+# elastic ip
+############
+
 resource "aws_eip" "this" {
   count = var.create_eip ? 1 : 0
 
@@ -55,6 +63,10 @@ resource "aws_eip_association" "this" {
   instance_id = aws_instance.this.id
 }
 
+############
+# ebs volume
+############
+
 resource "aws_ebs_volume" "this" {
   count = var.ebs_volume_size > 0 ? 1 : 0
 
@@ -70,6 +82,80 @@ resource "aws_ebs_volume" "this" {
   tags = local.tags
 }
 
+resource "aws_volume_attachment" "this" {
+  count = var.ebs_volume_size > 0 ? 1 : 0
+
+  device_name = var.volume_path
+
+//  volume_id = aws_ebs_volume.this.*.id[count.index]
+  volume_id = aws_ebs_volume.this[0].id
+  instance_id = aws_instance.this.id
+  force_detach = true
+}
+
+######################
+# IAM instance profile
+######################
+
+resource "aws_iam_role" "this" {
+  count = var.instance_profile_id == "" ? 1 : 0
+  name = title(local.name)
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+
+  tags = local.tags
+}
+
+resource "aws_iam_instance_profile" "this" {
+  count = var.instance_profile_id == "" ? 1 : 0
+
+  name = "${title(local.name)}InstanceProfile"
+  role = aws_iam_role.this[0].name
+}
+
+#########################
+# Additional IAM policies
+#########################
+
+resource "aws_iam_role_policy_attachment" "managed_policy" {
+  count = var.instance_profile_id == "" ? length(var.iam_managed_policies) : 0
+  role = aws_iam_role.this[0].id
+
+  policy_arn = "arn:aws:iam::aws:policy/${var.iam_managed_policies[count.index]}"
+}
+
+resource "aws_iam_policy" "json_policy" {
+  count = var.instance_profile_id == "" && var.json_policy_name != "" ? 1 : 0
+  name        = var.json_policy_name
+  description = "A user defined policy for the instance"
+
+  policy = var.json_policy
+}
+
+resource "aws_iam_role_policy_attachment" "json_policy" {
+  count = var.instance_profile_id == "" && var.json_policy_name != "" ? 1 : 0
+  role = aws_iam_role.this[0].id
+
+  policy_arn = aws_iam_policy.json_policy[0].arn
+}
+
+#########
+# keypair
+#########
+
 data "local_file" "key_local" {
   count = var.key_name == "" ? 1 : 0
   filename = var.local_public_key
@@ -81,15 +167,10 @@ resource "aws_key_pair" "this" {
   public_key = data.local_file.key_local[0].content
 }
 
-resource "aws_volume_attachment" "this" {
-  count = var.ebs_volume_size > 0 ? 1 : 0
+###########
+# user-data
+###########
 
-  device_name = var.volume_path
-
-  volume_id = aws_ebs_volume.this.*.id[count.index]
-  instance_id = aws_instance.this.id
-  force_detach = true
-}
 
 data "template_file" "user_data" {
   template = file("${path.module}/data/${var.user_data_script}")
@@ -100,6 +181,10 @@ data "template_file" "user_data" {
   }
 }
 
+##########
+# instance
+##########
+
 resource "aws_instance" "this" {
   instance_type = var.instance_type
 
@@ -108,7 +193,7 @@ resource "aws_instance" "this" {
 
   key_name = var.key_name == "" ? aws_key_pair.this[0].key_name : var.key_name
 
-  iam_instance_profile = var.instance_profile_id
+  iam_instance_profile = var.instance_profile_id == "" ? aws_iam_instance_profile.this[0].id :var.instance_profile_id
 
   subnet_id = var.subnet_id
   vpc_security_group_ids = var.security_groups

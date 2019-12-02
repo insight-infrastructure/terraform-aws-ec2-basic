@@ -14,3 +14,11 @@ output "instance_id" {
 output "volume_path" {
   value = var.volume_path
 }
+
+output "key_name" {
+  value = var.key_name == "" ? aws_key_pair.this[0].key_name : var.key_name
+}
+
+output "instance_profile_id" {
+  value = var.instance_profile_id == "" ? aws_iam_instance_profile.this[0].id :var.instance_profile_id
+}

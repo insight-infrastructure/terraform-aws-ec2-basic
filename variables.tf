@@ -76,6 +76,26 @@ variable "instance_profile_id" {
   type = string
   default = ""
 }
+variable "iam_managed_policies" {
+  type = list(string)
+  default = []
+  description = "List of managed policies to add to instance profile.  Instance profile must not be specified as it has precendance"
+}
+
+variable "json_policy" {
+  type = string
+  default = ""
+  description = "A user supplied policy to add to the instance"
+}
+
+variable "json_policy_name" {
+  type = string
+  default = ""
+  description = "The name of the user defined policy"
+}
+
+
+//----------------------------
 
 variable "log_config_bucket" {
   type = string
