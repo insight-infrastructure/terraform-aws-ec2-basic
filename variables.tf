@@ -7,10 +7,58 @@ variable "tags" {
   type        = map(string)
 }
 
+##########
+# instance
+##########
+
+variable "instance_type" {
+  type = string
+  default = "m4.large"
+}
+
+variable "root_volume_size" {
+  type = number
+  default = 8
+}
+
+variable "volume_path" {
+  type = string
+  default = "/dev/sdf"
+}
+
+variable "monitoring" {
+  type = bool
+  default = true
+  description = "Send logs and metrics to cloudwatch"
+}
+
+variable "ec2_prevent_destroy" {
+  type = bool
+  default = false
+}
+
+variable "eip_prevent_destroy" {
+  type = bool
+  default = false
+}
+
+###########
+# user-data
+###########
+
+variable "user_data_script" {
+  type = string
+  default = "user_data_ubuntu_ebs.sh"
+}
+
+variable "user_data" {
+  type = string
+  default = ""
+}
+
 #####
 # vpc
 #####
-
 
 variable "vpc_id" {
   type = string
@@ -63,20 +111,24 @@ variable "ingress_rules" {
   description = "From terraform-aws-security-group module"
 }
 
-#############
-# default AMI
-#############
 
+#####
+# AMI
+#####
 
-variable "instance_type" {
+variable "ami_id" {
   type = string
+  default = ""
 }
-variable "root_volume_size" {
-  type = number
-}
-variable "volume_path" {
+
+############
+# ebs volume
+############
+
+variable "ebs_volume_id" {
   type = string
-  default = "/dev/sdf"
+  default = ""
+  description = "The volume id of the ebs volume to mount"
 }
 
 variable "ebs_volume_size" {
@@ -88,17 +140,9 @@ variable "ebs_prevent_destroy" {
   default = false
 }
 
-variable "ec2_prevent_destroy" {
-  type = bool
-  default = false
-}
-
-variable "eip_prevent_destroy" {
-  type = bool
-  default = false
-}
-
-//----------------------------
+#########
+# keypair
+#########
 
 variable "key_name" {
   type = string
@@ -111,7 +155,9 @@ variable "local_public_key" {
   default = ""
 }
 
-//----------------------------
+#####
+# iam
+#####
 
 variable "instance_profile_id" {
   type = string
@@ -135,30 +181,16 @@ variable "json_policy_name" {
   description = "The name of the user defined policy"
 }
 
-
-//----------------------------
-
-variable "log_config_bucket" {
-  type = string
-  default = ""
-}
-variable "log_config_key" {
-  type = string
-  default = ""
-}
-
-variable "user_data_script" {
-  type = string
-  default = "user_data_ubuntu_ebs.sh"
-}
-
-variable "user_data" {
-  type = string
-  default = ""
-}
-
-variable "ami_id" {
-  type = string
-  default = ""
-}
+//#########
+//# logging
+//#########
+//
+//variable "log_config_bucket" {
+//  type = string
+//  default = ""
+//}
+//variable "log_config_key" {
+//  type = string
+//  default = ""
+//}
 

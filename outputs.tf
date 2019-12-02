@@ -4,7 +4,6 @@ output "private_ip" {
 
 output "public_ip" {
   value = var.create_eip ? join("", aws_eip.this.*.public_ip) : aws_instance.this.public_ip
-//  depends_on = [aws_eip.this]
 }
 
 output "instance_id" {

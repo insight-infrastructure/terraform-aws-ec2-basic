@@ -23,17 +23,17 @@ locals {
 resource "aws_instance" "this" {
   instance_type = var.instance_type
 
-  ami = var.ami_id == "" ? data.aws_ami.ubuntu.id : var.ami_id
   user_data = var.user_data == "" ? data.template_file.user_data.rendered : var.user_data
-
-  key_name = var.key_name == "" ? aws_key_pair.this[0].key_name : var.key_name
-
-  iam_instance_profile = var.instance_profile_id == "" ? aws_iam_instance_profile.this[0].id : var.instance_profile_id
 
   subnet_id = var.subnet_id == "" ? tolist(data.aws_subnet_ids.default_subnets.ids)[0] : var.subnet_id
   vpc_security_group_ids = var.security_groups == [] ? [module.security_group.this_security_group_id] : var.security_groups
 
-//  monitoring = var.monitoring
+  ami = var.ami_id == "" ? data.aws_ami.ubuntu.id : var.ami_id
+
+  monitoring = var.monitoring
+
+  iam_instance_profile = var.instance_profile_id == "" ? aws_iam_instance_profile.this[0].id : var.instance_profile_id
+  key_name = var.key_name == "" ? aws_key_pair.this[0].key_name : var.key_name
 
   root_block_device {
     volume_type = "gp2"
@@ -47,6 +47,14 @@ resource "aws_instance" "this" {
   //  }
 
   tags = local.tags
+}
+
+###########
+# user-data
+###########
+
+data "template_file" "user_data" {
+  template = file("${path.module}/data/${var.user_data_script}")
 }
 
 #############
@@ -129,7 +137,6 @@ data "aws_ami" "ubuntu" {
   # Canonical
 }
 
-
 ############
 # ebs volume
 ############
@@ -138,6 +145,7 @@ resource "aws_ebs_volume" "this" {
   count = var.ebs_volume_size > 0 ? 1 : 0
 
   availability_zone = aws_instance.this.availability_zone
+
   size = var.ebs_volume_size
   type = "gp2"
 
@@ -154,8 +162,8 @@ resource "aws_volume_attachment" "this" {
 
   device_name = var.volume_path
 
-  //  volume_id = aws_ebs_volume.this.*.id[count.index]
-  volume_id = aws_ebs_volume.this[0].id
+  volume_id = var.ebs_volume_id == "" ? aws_ebs_volume.this[0].id : var.ebs_volume_id
+
   instance_id = aws_instance.this.id
   force_detach = true
 }
@@ -232,19 +240,5 @@ resource "aws_key_pair" "this" {
   count = var.key_name == "" ? 1 : 0
   key_name = local.name
   public_key = data.local_file.key_local[0].content
-}
-
-###########
-# user-data
-###########
-
-
-data "template_file" "user_data" {
-  template = file("${path.module}/data/${var.user_data_script}")
-
-  vars = {
-    log_config_bucket = var.log_config_bucket
-    log_config_key = var.log_config_key
-  }
 }
 
