@@ -194,10 +194,12 @@ EOF
   tags = local.tags
 }
 
+resource "random_pet" "this" {}
+
 resource "aws_iam_instance_profile" "this" {
   count = var.instance_profile_id == "" ? 1 : 0
 
-  name = "${title(local.name)}InstanceProfile"
+  name = "${title(local.name)}InstanceProfile-${random_pet.this.id}"
   role = aws_iam_role.this[0].name
 }
 
