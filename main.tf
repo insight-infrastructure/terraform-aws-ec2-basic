@@ -1,6 +1,5 @@
 data "aws_caller_identity" "this" {}
 data "aws_region" "current" {}
-
 terraform {
   required_version = ">= 0.12"
 }
@@ -15,6 +14,8 @@ locals {
 
   tags = merge(var.tags, local.common_tags)
 }
+
+resource "random_pet" "this" {}
 
 ##########
 # instance
@@ -194,8 +195,6 @@ EOF
   tags = local.tags
 }
 
-resource "random_pet" "this" {}
-
 resource "aws_iam_instance_profile" "this" {
   count = var.instance_profile_id == "" ? 1 : 0
 
@@ -240,7 +239,7 @@ data "local_file" "key_local" {
 
 resource "aws_key_pair" "this" {
   count = var.key_name == "" ? 1 : 0
-  key_name = local.name
+  key_name = "${local.name}-${random_pet.this.id}"
   public_key = data.local_file.key_local[0].content
 }
 
