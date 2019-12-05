@@ -232,14 +232,10 @@ resource "aws_iam_role_policy_attachment" "json_policy" {
 # keypair
 #########
 
-data "local_file" "key_local" {
-  count = var.key_name == "" ? 1 : 0
-  filename = var.local_public_key
-}
 
 resource "aws_key_pair" "this" {
   count = var.key_name == "" ? 1 : 0
   key_name = "${local.name}-${random_pet.this.id}"
-  public_key = data.local_file.key_local[0].content
+  public_key = file(var.local_public_key)
 }
 
