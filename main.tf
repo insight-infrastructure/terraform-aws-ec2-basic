@@ -75,6 +75,8 @@ data "aws_subnet_ids" "default_subnets" {
 #################
 
 module "security_group" {
+  create = var.security_groups == [] ? true : false
+
   source = "terraform-aws-modules/security-group/aws"
   version = "~> 3.0"
 
@@ -87,8 +89,6 @@ module "security_group" {
 
   ingress_cidr_blocks = var.ingress_cidr_blocks
   ingress_with_cidr_blocks = var.ingress_with_cidr_blocks
-
-  create = var.security_groups == [] ? true : false
 }
 
 ############
@@ -231,7 +231,6 @@ resource "aws_iam_role_policy_attachment" "json_policy" {
 #########
 # keypair
 #########
-
 
 resource "aws_key_pair" "this" {
   count = var.key_name == "" ? 1 : 0

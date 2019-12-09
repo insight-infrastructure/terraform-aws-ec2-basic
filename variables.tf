@@ -88,6 +88,8 @@ variable "create_eip" {
 
 variable "security_groups" {
   type = list(string)
+  default = []
+  description = "A list of provided descurity group IDs"
 }
 
 variable "egress_rules" {
@@ -95,22 +97,24 @@ variable "egress_rules" {
   type = list(string)
   description = "From terraform-aws-security-group module"
 }
+
 variable "ingress_cidr_blocks" {
   type = list(string)
   default = []
   description = "From terraform-aws-security-group module"
 }
+
 variable "ingress_with_cidr_blocks" {
-  default = [{}]
+  default = []
   type = list(map(string))
   description = "From terraform-aws-security-group module"
 }
+
 variable "ingress_rules" {
   type = list(string)
   default = []
   description = "From terraform-aws-security-group module"
 }
-
 
 #####
 # AMI
