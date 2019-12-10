@@ -27,7 +27,7 @@ resource "aws_instance" "this" {
   user_data = var.user_data == "" ? data.template_file.user_data.rendered : var.user_data
 
   subnet_id = var.subnet_id == "" ? tolist(data.aws_subnet_ids.default_subnets.ids)[0] : var.subnet_id
-  vpc_security_group_ids = var.security_groups == [] ? [module.security_group.this_security_group_id] : var.security_groups
+  vpc_security_group_ids = concat([module.security_group.this_security_group_id], var.security_groups)
 
   ami = var.ami_id == "" ? data.aws_ami.ubuntu.id : var.ami_id
 
