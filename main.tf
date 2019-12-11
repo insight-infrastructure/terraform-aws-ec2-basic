@@ -84,7 +84,7 @@ module "security_group" {
 
   create = var.vpc_security_group_ids == [] && var.create ? true : false
 
-  name = var.name
+  name = "${var.name}-${random_pet.this.id}"
   description = "Default security group if no security groups ids are supplied"
   vpc_id = var.vpc_id == "" ? data.aws_vpc.default.id : var.vpc_id
 
