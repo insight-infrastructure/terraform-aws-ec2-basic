@@ -25,15 +25,14 @@ resource "aws_instance" "this" {
   count = var.create ? 1 : 0
 
   instance_type = var.instance_type
+  ami = var.ami_id == "" ? data.aws_ami.ubuntu.id : var.ami_id
 
   user_data = var.user_data == "" ? data.template_file.user_data.rendered : var.user_data
 
   subnet_id = var.subnet_id == "" ? tolist(data.aws_subnet_ids.default_subnets.ids)[0] : var.subnet_id
-//  vpc_security_group_ids = concat([module.security_group.this_security_group_id], var.vpc_security_group_ids)
-  vpc_security_group_ids = var.vpc_security_group_ids
-  security_groups = var.vpc_security_group_ids == [] ? module.security_group.this_security_group_id : []
 
-  ami = var.ami_id == "" ? data.aws_ami.ubuntu.id : var.ami_id
+  vpc_security_group_ids = var.vpc_security_group_ids
+  security_groups = var.vpc_security_group_ids == [] ? [module.security_group.this_security_group_id] : []
 
   monitoring = var.monitoring
 
