@@ -80,7 +80,7 @@ module "security_group" {
   source = "terraform-aws-modules/security-group/aws"
   version = "~> 3.0"
 
-  create = var.security_groups && var.create == [] ? true : false
+  create = var.security_groups == [] && var.create ? true : false
 
   name = var.name
   description = "Default security group if no security groups ids are supplied"
