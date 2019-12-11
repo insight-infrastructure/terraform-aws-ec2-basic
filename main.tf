@@ -22,6 +22,8 @@ resource "random_pet" "this" {}
 ##########
 
 resource "aws_instance" "this" {
+  count = var.create ? 1 : 0
+
   instance_type = var.instance_type
 
   user_data = var.user_data == "" ? data.template_file.user_data.rendered : var.user_data
@@ -111,7 +113,7 @@ resource "aws_eip_association" "this" {
   count = var.create_eip ? 1 : 0
 
   allocation_id = aws_eip.this.*.id[count.index]
-  instance_id = aws_instance.this.id
+  instance_id = aws_instance.this.*.id[0]
 }
 
 #############
@@ -145,7 +147,7 @@ data "aws_ami" "ubuntu" {
 resource "aws_ebs_volume" "this" {
   count = var.ebs_volume_size > 0 ? 1 : 0
 
-  availability_zone = aws_instance.this.availability_zone
+  availability_zone = aws_instance.this.*.availability_zone[0]
 
   size = var.ebs_volume_size
   type = "gp2"
@@ -165,7 +167,7 @@ resource "aws_volume_attachment" "this" {
 
   volume_id = var.ebs_volume_id == "" ? aws_ebs_volume.this[0].id : var.ebs_volume_id
 
-  instance_id = aws_instance.this.id
+  instance_id = aws_instance.this.*.id[0]
   force_detach = true
 }
 
@@ -175,7 +177,7 @@ resource "aws_volume_attachment" "this" {
 
 resource "aws_iam_role" "this" {
   count = var.instance_profile_id == "" ? 1 : 0
-  name = title(local.name)
+  name = "${title(local.name)}-${random_pet.this.id}"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",

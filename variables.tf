@@ -7,6 +7,12 @@ variable "tags" {
   type        = map(string)
 }
 
+variable "create" {
+  type = bool
+  default = true
+  description = "Boolean to determine if you should create the instance or destroy all associated resources"
+}
+
 ##########
 # instance
 ##########
