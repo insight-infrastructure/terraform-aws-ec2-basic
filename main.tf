@@ -29,7 +29,9 @@ resource "aws_instance" "this" {
   user_data = var.user_data == "" ? data.template_file.user_data.rendered : var.user_data
 
   subnet_id = var.subnet_id == "" ? tolist(data.aws_subnet_ids.default_subnets.ids)[0] : var.subnet_id
-  vpc_security_group_ids = concat([module.security_group.this_security_group_id], var.security_groups)
+//  vpc_security_group_ids = concat([module.security_group.this_security_group_id], var.vpc_security_group_ids)
+  vpc_security_group_ids = var.vpc_security_group_ids
+  security_groups = var.vpc_security_group_ids == [] ? module.security_group.this_security_group_id : []
 
   ami = var.ami_id == "" ? data.aws_ami.ubuntu.id : var.ami_id
 
@@ -80,7 +82,7 @@ module "security_group" {
   source = "terraform-aws-modules/security-group/aws"
   version = "~> 3.0"
 
-  create = var.security_groups == [] && var.create ? true : false
+  create = var.vpc_security_group_ids == [] && var.create ? true : false
 
   name = var.name
   description = "Default security group if no security groups ids are supplied"
