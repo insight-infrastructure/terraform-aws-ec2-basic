@@ -29,7 +29,7 @@ resource "aws_instance" "this" {
 
   user_data = var.user_data == "" ? data.template_file.user_data.rendered : var.user_data
 
-  subnet_id = var.subnet_id == "" ? tolist(data.aws_subnet_ids.default_subnets.ids)[length(tolist(data.aws_subnet_ids.default_subnets.ids))] : var.subnet_id
+  subnet_id = var.subnet_id == "" ? data.aws_subnet.default.*.id[0] : var.subnet_id
 
   vpc_security_group_ids = var.vpc_security_group_ids
   security_groups = var.vpc_security_group_ids == [] ? [module.security_group.this_security_group_id] : []
@@ -69,8 +69,13 @@ data "aws_vpc" "default" {
   default = true
 }
 
-data "aws_subnet_ids" "default_subnets" {
+data "aws_subnet_ids" "default" {
   vpc_id = data.aws_vpc.default.id
+}
+
+data "aws_subnet" "default" {
+  count = length(data.aws_subnet_ids.default.ids)
+  id    = tolist(data.aws_subnet_ids.default.ids)[count.index]
 }
 
 #################
