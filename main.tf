@@ -29,7 +29,7 @@ resource "aws_instance" "this" {
 
   user_data = var.user_data == "" ? data.template_file.user_data.rendered : var.user_data
 
-  subnet_id = var.subnet_id == "" ? tolist(data.aws_subnet_ids.default_subnets.ids)[-1] : var.subnet_id
+  subnet_id = var.subnet_id == "" ? tolist(data.aws_subnet_ids.default_subnets.ids)[length(tolist(data.aws_subnet_ids.default_subnets.ids))] : var.subnet_id
 
   vpc_security_group_ids = var.vpc_security_group_ids
   security_groups = var.vpc_security_group_ids == [] ? [module.security_group.this_security_group_id] : []
