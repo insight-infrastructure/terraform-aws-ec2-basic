@@ -65,6 +65,8 @@ data "template_file" "user_data" {
 # default vpc
 #############
 
+resource "aws_default_vpc" "this" {}
+
 data "aws_vpc" "default" {
   default = true
 }
@@ -90,7 +92,8 @@ module "security_group" {
 
   name = "${var.name}-${random_pet.this.id}"
   description = "Default security group if no security groups ids are supplied"
-  vpc_id = var.vpc_id == "" ? data.aws_vpc.default.id : var.vpc_id
+
+  vpc_id = var.vpc_id == "" ? aws_default_vpc.this.id : var.vpc_id
 
   ingress_rules = var.ingress_rules
   egress_rules = var.egress_rules
