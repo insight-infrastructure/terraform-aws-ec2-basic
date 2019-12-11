@@ -77,10 +77,10 @@ data "aws_subnet_ids" "default_subnets" {
 #################
 
 module "security_group" {
-  create = var.security_groups == [] ? true : false
-
   source = "terraform-aws-modules/security-group/aws"
   version = "~> 3.0"
+
+  create = var.security_groups && var.create == [] ? true : false
 
   name = var.name
   description = "Default security group if no security groups ids are supplied"
@@ -98,7 +98,7 @@ module "security_group" {
 ############
 
 resource "aws_eip" "this" {
-  count = var.create_eip ? 1 : 0
+  count = var.create_eip && var.create ? 1 : 0
 
   vpc = true
 
@@ -110,7 +110,7 @@ resource "aws_eip" "this" {
 }
 
 resource "aws_eip_association" "this" {
-  count = var.create_eip ? 1 : 0
+  count = var.create_eip && var.create ? 1 : 0
 
   allocation_id = aws_eip.this.*.id[count.index]
   instance_id = aws_instance.this.*.id[0]
@@ -145,7 +145,7 @@ data "aws_ami" "ubuntu" {
 ############
 
 resource "aws_ebs_volume" "this" {
-  count = var.ebs_volume_size > 0 ? 1 : 0
+  count = var.ebs_volume_size > 0 && var.create ? 1 : 0
 
   availability_zone = aws_instance.this.*.availability_zone[0]
 
@@ -161,7 +161,7 @@ resource "aws_ebs_volume" "this" {
 }
 
 resource "aws_volume_attachment" "this" {
-  count = var.ebs_volume_size > 0 ? 1 : 0
+  count = var.ebs_volume_size > 0 && var.create ? 1 : 0
 
   device_name = var.volume_path
 
@@ -176,7 +176,7 @@ resource "aws_volume_attachment" "this" {
 ######################
 
 resource "aws_iam_role" "this" {
-  count = var.instance_profile_id == "" ? 1 : 0
+  count = var.instance_profile_id == "" && var.create ? 1 : 0
   name = "${title(local.name)}-${random_pet.this.id}"
   assume_role_policy = <<EOF
 {
@@ -198,7 +198,7 @@ EOF
 }
 
 resource "aws_iam_instance_profile" "this" {
-  count = var.instance_profile_id == "" ? 1 : 0
+  count = var.instance_profile_id == "" && var.create ? 1 : 0
 
   name = "${title(local.name)}InstanceProfile-${random_pet.this.id}"
   role = aws_iam_role.this[0].name
@@ -209,14 +209,14 @@ resource "aws_iam_instance_profile" "this" {
 #########################
 
 resource "aws_iam_role_policy_attachment" "managed_policy" {
-  count = var.instance_profile_id == "" ? length(var.iam_managed_policies) : 0
+  count = var.instance_profile_id == "" && var.create ? length(var.iam_managed_policies) : 0
   role = aws_iam_role.this[0].id
 
   policy_arn = "arn:aws:iam::aws:policy/${var.iam_managed_policies[count.index]}"
 }
 
 resource "aws_iam_policy" "json_policy" {
-  count = var.instance_profile_id == "" && var.json_policy_name != "" ? 1 : 0
+  count = var.instance_profile_id == "" && var.json_policy_name != "" && var.create ? 1 : 0
   name = var.json_policy_name
   description = "A user defined policy for the instance"
 
@@ -224,7 +224,7 @@ resource "aws_iam_policy" "json_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "json_policy" {
-  count = var.instance_profile_id == "" && var.json_policy_name != "" ? 1 : 0
+  count = var.instance_profile_id == "" && var.json_policy_name != "" && var.create ? 1 : 0
   role = aws_iam_role.this[0].id
 
   policy_arn = aws_iam_policy.json_policy[0].arn
@@ -235,7 +235,7 @@ resource "aws_iam_role_policy_attachment" "json_policy" {
 #########
 
 resource "aws_key_pair" "this" {
-  count = var.key_name == "" ? 1 : 0
+  count = var.key_name == "" && var.create ? 1 : 0
   key_name = "${local.name}-${random_pet.this.id}"
   public_key = file(var.local_public_key)
 }
