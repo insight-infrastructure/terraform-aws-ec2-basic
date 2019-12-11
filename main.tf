@@ -31,8 +31,8 @@ resource "aws_instance" "this" {
 
   subnet_id = var.subnet_id == "" ? data.aws_subnet.default.*.id[length(data.aws_subnet.default.*.id) - 1] : var.subnet_id
 
-  vpc_security_group_ids = var.vpc_security_group_ids
-  security_groups = var.vpc_security_group_ids == [] ? [module.security_group.this_security_group_id] : []
+  vpc_security_group_ids = compact(var.vpc_security_group_ids)
+  security_groups = var.vpc_security_group_ids[0] == "" ? [module.security_group.this_security_group_id] : []
 
   monitoring = var.monitoring
 
@@ -88,7 +88,7 @@ module "security_group" {
   source = "terraform-aws-modules/security-group/aws"
   version = "~> 3.0"
 
-  create = var.vpc_security_group_ids == [] && var.create ? true : false
+  create = var.vpc_security_group_ids[0] == "" && var.create ? true : false
 
   name = "${var.name}-${random_pet.this.id}"
   description = "Default security group if no security groups ids are supplied"
