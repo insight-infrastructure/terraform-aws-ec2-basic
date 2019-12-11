@@ -86,7 +86,7 @@ module "security_group" {
   source = "terraform-aws-modules/security-group/aws"
   version = "~> 3.0"
 
-  create = var.vpc_security_group_ids == [] && var.create ? true : false
+  create = var.vpc_security_group_ids != [] && var.create ? true : false
 
   name = "${var.name}-${random_pet.this.id}"
   description = "Default security group if no security groups ids are supplied"
