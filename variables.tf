@@ -94,7 +94,7 @@ variable "create_eip" {
 
 variable "vpc_security_group_ids" {
   type = list(string)
-  default = [""]
+  default = null
   description = "A list of provided descurity group IDs"
 }
 
