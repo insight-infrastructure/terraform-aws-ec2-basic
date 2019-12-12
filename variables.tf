@@ -7,6 +7,12 @@ variable "tags" {
   type        = map(string)
 }
 
+variable "create" {
+  type = bool
+  default = true
+  description = "Boolean to determine if you should create the instance or destroy all associated resources"
+}
+
 ##########
 # instance
 ##########
@@ -86,9 +92,9 @@ variable "create_eip" {
 # security groups
 #################
 
-variable "security_groups" {
+variable "vpc_security_group_ids" {
   type = list(string)
-  default = []
+  default = null
   description = "A list of provided descurity group IDs"
 }
 
