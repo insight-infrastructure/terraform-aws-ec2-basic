@@ -29,7 +29,8 @@ resource "aws_instance" "this" {
 
   user_data = var.user_data == "" ? data.template_file.user_data.rendered : var.user_data
 
-  subnet_id = var.subnet_id == "" ? data.aws_subnet.default.*.id[length(data.aws_subnet.default.*.id) - 1] : var.subnet_id
+  subnet_id = var.subnet_id == "" ? values(zipmap(data.aws_subnet.default.*.availability_zone, data.aws_subnet.default.*.id)) : var.subnet_id
+//  data.aws_subnet.default.*.id[length(data.aws_subnet.default.*.id) - 1]
 
   vpc_security_group_ids = var.vpc_security_group_ids == null ? [module.security_group.this_security_group_id] : var.vpc_security_group_ids
 
