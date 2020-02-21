@@ -31,7 +31,6 @@ func TestTerraformDefaults(t *testing.T) {
 		Vars: map[string]interface{}{
 			"aws_region":         awsRegion,
 			"public_key_path":    publicKeyPath,
-			"private_key_path":   privateKeyPath,
 		},
 	}
 

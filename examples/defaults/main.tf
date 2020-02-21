@@ -1,7 +1,7 @@
+variable "public_key_path" {}
 
 module "defaults" {
-  source          = "../.."
-  ebs_volume_size = 0
-  name            = ""
-  tags            = ""
+  source           = "../.."
+  name             = ""
+  local_public_key = var.public_key_path
 }
