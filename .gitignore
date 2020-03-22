@@ -3,6 +3,8 @@ _old/
 
 *account.tfvars
 
+test/fixtures/keys/id_rsa_test
+test/fixtures/keys/id_rsa_test.pub
 
 _old/
 .idea/
