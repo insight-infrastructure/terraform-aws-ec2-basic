@@ -35,7 +35,7 @@ resource "aws_instance" "this" {
 
   monitoring = var.monitoring
 
-  iam_instance_profile = var.instance_profile_id == "" ? aws_iam_instance_profile.this[0].id : var.instance_profile_id
+  iam_instance_profile = var.instance_profile_id == "" ? join("", aws_iam_instance_profile.this.*.id) : var.instance_profile_id
   key_name             = var.key_name == "" ? aws_key_pair.this[0].key_name : var.key_name
 
   root_block_device {
@@ -120,8 +120,8 @@ resource "aws_eip" "this" {
 resource "aws_eip_association" "this" {
   count = var.create_eip && var.create ? 1 : 0
 
-  allocation_id = aws_eip.this.*.id[count.index]
-  instance_id   = aws_instance.this.*.id[0]
+  allocation_id = join("", aws_eip.this.*.id)
+  instance_id   = join("", aws_instance.this.*.id)
 }
 
 #############
@@ -155,7 +155,7 @@ data "aws_ami" "ubuntu" {
 resource "aws_ebs_volume" "this" {
   count = var.ebs_volume_size > 0 && var.create ? 1 : 0
 
-  availability_zone = aws_instance.this.*.availability_zone[0]
+  availability_zone = join("", aws_instance.this.*.availability_zone)
 
   size = var.ebs_volume_size
   type = "gp2"
@@ -173,9 +173,9 @@ resource "aws_volume_attachment" "this" {
 
   device_name = var.volume_path
 
-  volume_id = var.ebs_volume_id == "" ? aws_ebs_volume.this[0].id : var.ebs_volume_id
+  volume_id = var.ebs_volume_id == "" ? join("", aws_ebs_volume.this.*.id) : var.ebs_volume_id
 
-  instance_id  = aws_instance.this.*.id[0]
+  instance_id  = join("", aws_instance.this.*.id)
   force_detach = true
 }
 
@@ -209,7 +209,7 @@ resource "aws_iam_instance_profile" "this" {
   count = var.instance_profile_id == "" && var.create ? 1 : 0
 
   name = "${title(local.name)}InstanceProfile-${random_pet.this.id}"
-  role = aws_iam_role.this[0].name
+  role = join("", aws_iam_role.this.*.name)
 }
 
 #########################
@@ -218,7 +218,7 @@ resource "aws_iam_instance_profile" "this" {
 
 resource "aws_iam_role_policy_attachment" "managed_policy" {
   count = var.instance_profile_id == "" && var.create ? length(var.iam_managed_policies) : 0
-  role  = aws_iam_role.this[0].id
+  role  = join("", aws_iam_role.this.*.id)
 
   policy_arn = "arn:aws:iam::aws:policy/${var.iam_managed_policies[count.index]}"
 }
@@ -233,9 +233,9 @@ resource "aws_iam_policy" "json_policy" {
 
 resource "aws_iam_role_policy_attachment" "json_policy" {
   count = var.instance_profile_id == "" && var.json_policy_name != "" && var.create ? 1 : 0
-  role  = aws_iam_role.this[0].id
+  role  = join("", aws_iam_role.this.*.id)
 
-  policy_arn = aws_iam_policy.json_policy[0].arn
+  policy_arn = join("", aws_iam_policy.json_policy.*.arn)
 }
 
 #########
